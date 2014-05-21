@@ -24,4 +24,3 @@ The dataset includes the following files:
 
 **CodeBook.md** This file describes the variables, the data, and any transformations or work that you performed to clean up the data
 
-**CodeBook.Rmd** This file creates the CodeBook.md
