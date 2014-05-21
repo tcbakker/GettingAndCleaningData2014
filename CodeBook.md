@@ -39,27 +39,27 @@ trainActivityData <- read.table("data/train/y_train.txt")
 testXData <- read.table("data/test/X_test.txt")
 trainXData <- read.table("data/train/X_train.txt")
 
-## merge SubjectData, rename V1 and add a subject.rowID
+## merge SubjectData, rename V1 and add a subjectrowID
 mergedSubjectData <- rbind(testSubjectData, trainSubjectData)
-colnames(mergedSubjectData) <- ("subject.ID")
+colnames(mergedSubjectData) <- ("subject")
 mergedSubjectData$subject.rowID <- 1:10299
 
-## merge ActivityData, rebane V1 and add activity.rowID
+## merge ActivityData, rebane V1 and add activityrowID
 mergedActivityData <- rbind(testActivityData, trainActivityData)
 colnames(mergedActivityData) <- ("activity")
-mergedActivityData$activity.rowID <- 1:10299
+mergedActivityData$activityrowID <- 1:10299
 
 ## merge XData
 mergedXData <- rbind(testXData, trainXData)
 
 ## add rowID
-mergedXData$X.rowID <- 1:10299
+mergedXData$XrowID <- 1:10299
 
 ## [a few lines here are omitted and explained below]
 
 ## merge Subjectdata, ActivityData & XData
-mergedDfTotal <- merge(mergedSubjectData, mergedActivityData, by.x = "subject.rowID", by.y = "activity.rowID", all = TRUE)
-mergedDfTotal <- merge(mergedDfTotal, mergedXData, by.x = "subject.rowID", by.y = "X.rowID")
+mergedDfTotal <- merge(mergedSubjectData, mergedActivityData, by.x = "subjectrowID", by.y = "activityrowID", all = TRUE)
+mergedDfTotal <- merge(mergedDfTotal, mergedXData, by.x = "subjectrowID", by.y = "XrowID")
 
 ```
 
@@ -70,7 +70,7 @@ All elements of the features.txt (second column) were renamed to create descript
 
 ```
 ## read names from features.txt
-## and clean names from () and , and -
+## and clean names from () and , and - and _
 ## change names to make them descriptive enough to understand
 features <- read.table("data/features.txt")
 features[,2] <- gsub(c("Acc"),"_acceleration_",features[,2])
@@ -95,6 +95,7 @@ features[,2] <- gsub("X","_x",features[,2])
 features[,2] <- gsub("Y","_y",features[,2])
 features[,2] <- gsub("Z","_z",features[,2])
 features[,2] <- gsub("__","_",features[,2])
+features[,2] <- gsub("_","",features[,2])
 names(mergedXData) <- features[,2]
 ```
 
@@ -139,12 +140,12 @@ The original merged data frame was copied to a average data frame. The first col
 
 avgDf <- mergedDfTotal
 avgDf <- avgDf[,2:length(names(avgDf))] 
-avgDf$subject.ID <- as.factor(avgDf$subject.ID)
+avgDf$subject <- as.factor(avgDf$subject)
 avgDf$activity <- as.factor(avgDf$activity)
 
-## use plyr package to create averages per column, group by subject.ID and activity
+## use plyr package to create averages per column, group by subject and activity
 library(plyr)
-dt <- ddply(avgDf, .(subject.ID, activity), numcolwise(mean))
+dt <- ddply(avgDf, .(subject, activity), numcolwise(mean))
 ## create file and store results
 write.table(dt, file = "data/averagesPerSubjectAndActivity.txt")
 ```
@@ -153,91 +154,91 @@ Variables in the file averagesPerSubjectAndActivity.txt are:
 -------------------------------------------------------------------
 |    | averagesPerSubjectAndActivity.txt                                                       |
 |----|-----------------------------------------------------------------|
-| 1  | subject.ID                                                |
+| 1  | subject                                                |
 | 2  | activity                                                  |
-| 3  | time_body_acceleration_mean_x                                   |
-| 4  | time_body_acceleration_mean_y                                   |
-| 5  | time_body_acceleration_mean_z                                   |
-| 6  | time_body_acceleration_std_x                                    |
-| 7  | time_body_acceleration_std_y                                    |
-| 8  | time_body_acceleration_std_z                                    |
-| 9  | time_gravity_acceleration_mean_x                                |
-| 10 | time_gravity_acceleration_mean_y                                |
-| 11 | time_gravity_acceleration_mean_z                                |
-| 12 | time_gravity_acceleration_std_x                                 |
-| 13 | time_gravity_acceleration_std_y                                 |
-| 14 | time_gravity_acceleration_std_z                                 |
-| 15 | time_body_acceleration_jerk_mean_x                              |
-| 16 | time_body_acceleration_jerk_mean_y                              |
-| 17 | time_body_acceleration_jerk_mean_z                              |
-| 18 | time_body_acceleration_jerk_std_x                               |
-| 19 | time_body_acceleration_jerk_std_y                               |
-| 20 | time_body_acceleration_jerk_std_z                               |
-| 21 | time_body_gyro_mean_x                                           |
-| 22 | time_body_gyro_mean_y                                           |
-| 23 | time_body_gyro_mean_z                                           |
-| 24 | time_body_gyro_std_x                                            |
-| 25 | time_body_gyro_std_y                                            |
-| 26 | time_body_gyro_std_z                                            |
-| 27 | time_body_gyro_jerk_mean_x                                      |
-| 28 | time_body_gyro_jerk_mean_y                                      |
-| 29 | time_body_gyro_jerk_mean_z                                      |
-| 30 | time_body_gyro_jerk_std_x                                       |
-| 31 | time_body_gyro_jerk_std_y                                       |
-| 32 | time_body_gyro_jerk_std_z                                       |
-| 33 | time_body_acceleration_magnitude_mean                           |
-| 34 | time_body_acceleration_magnitude_std                            |
-| 35 | time_gravity_acceleration_magnitude_mean                        |
-| 36 | time_gravity_acceleration_magnitude_std                         |
-| 37 | time_body_acceleration_jerk_magnitude_mean                      |
-| 38 | time_body_acceleration_jerk_magnitude_std                       |
-| 39 | time_body_gyro_magnitude_mean                                   |
-| 40 | time_body_gyro_magnitude_std                                    |
-| 41 | time_body_gyro_jerk_magnitude_mean                              |
-| 42 | time_body_gyro_jerk_magnitude_std                               |
-| 43 | frequencydomain_body_acceleration_mean_x                        |
-| 44 | frequencydomain_body_acceleration_mean_y                        |
-| 45 | frequencydomain_body_acceleration_mean_z                        |
-| 46 | frequencydomain_body_acceleration_std_x                         |
-| 47 | frequencydomain_body_acceleration_std_y                         |
-| 48 | frequencydomain_body_acceleration_std_z                         |
-| 49 | frequencydomain_body_acceleration_mean_frequency_x              |
-| 50 | frequencydomain_body_acceleration_mean_frequency_y              |
-| 51 | frequencydomain_body_acceleration_mean_frequency_z              |
-| 52 | frequencydomain_body_acceleration_jerk_mean_x                   |
-| 53 | frequencydomain_body_acceleration_jerk_mean_y                   |
-| 54 | frequencydomain_body_acceleration_jerk_mean_z                   |
-| 55 | frequencydomain_body_acceleration_jerk_std_x                    |
-| 56 | frequencydomain_body_acceleration_jerk_std_y                    |
-| 57 | frequencydomain_body_acceleration_jerk_std_z                    |
-| 58 | frequencydomain_body_acceleration_jerk_mean_frequency_x         |
-| 59 | frequencydomain_body_acceleration_jerk_mean_frequency_y         |
-| 60 | frequencydomain_body_acceleration_jerk_mean_frequency_z         |
-| 61 | frequencydomain_body_gyro_mean_x                                |
-| 62 | frequencydomain_body_gyro_mean_y                                |
-| 63 | frequencydomain_body_gyro_mean_z                                |
-| 64 | frequencydomain_body_gyro_std_x                                 |
-| 65 | frequencydomain_body_gyro_std_y                                 |
-| 66 | frequencydomain_body_gyro_std_z                                 |
-| 67 | frequencydomain_body_gyro_mean_frequency_x                      |
-| 68 | frequencydomain_body_gyro_mean_frequency_y                      |
-| 69 | frequencydomain_body_gyro_mean_frequency_z                      |
-| 70 | frequencydomain_body_acceleration_magnitude_mean                |
-| 71 | frequencydomain_body_acceleration_magnitude_std                 |
-| 72 | frequencydomain_body_acceleration_magnitude_mean_frequency      |
-| 73 | frequencydomain_body_acceleration_jerk_magnitude_mean           |
-| 74 | frequencydomain_body_acceleration_jerk_magnitude_std            |
-| 75 | frequencydomain_body_acceleration_jerk_magnitude_mean_frequency |
-| 76 | frequencydomain_body_gyro_magnitude_mean                        |
-| 77 | frequencydomain_body_gyro_magnitude_std                         |
-| 78 | frequencydomain_body_gyro_magnitude_mean_frequency              |
-| 79 | frequencydomain_body_gyro_jerk_magnitude_mean                   |
-| 80 | frequencydomain_body_gyro_jerk_magnitude_std                    |
-| 81 | frequencydomain_body_gyro_jerk_magnitude_mean_frequency         |
-| 82 | angle_time_body_acceleration_mean_gravity                       |
-| 83 | angle_time_body_acceleration_jerk_mean_gravity_mean             |
-| 84 | angle_time_body_gyro_mean_gravity_mean                          |
-| 85 | angle_time_body_gyro_jerk_mean_gravity_mean                     |
-| 86 | angle_x_gravity_mean                                            |
-| 87 | angle_y_gravity_mean                                            |
-| 88 | angle_z_gravity_mean                                            |
+| 3  | timebodyaccelerationmeanx                                   |
+| 4  | timebodyaccelerationmeany                                   |
+| 5  | timebodyaccelerationmeanz                                   |
+| 6  | timebodyaccelerationstdx                                    |
+| 7  | timebodyaccelerationstdy                                    |
+| 8  | timebodyaccelerationstdz                                    |
+| 9  | timegravityaccelerationmeanx                                |
+| 10 | timegravityaccelerationmeany                                |
+| 11 | timegravityaccelerationmeanz                                |
+| 12 | timegravityaccelerationstdx                                 |
+| 13 | timegravityaccelerationstdy                                 |
+| 14 | timegravityaccelerationstdz                                 |
+| 15 | timebodyaccelerationjerkmeanx                              |
+| 16 | timebodyaccelerationjerkmeany                              |
+| 17 | timebodyaccelerationjerkmeanz                              |
+| 18 | timebodyaccelerationjerkstdx                               |
+| 19 | timebodyaccelerationjerkstdy                               |
+| 20 | timebodyaccelerationjerkstdz                               |
+| 21 | timebodygyromeanx                                           |
+| 22 | timebodygyromeany                                           |
+| 23 | timebodygyromeanz                                           |
+| 24 | timebodygyrostdx                                            |
+| 25 | timebodygyrostdy                                            |
+| 26 | timebodygyrostdz                                            |
+| 27 | timebodygyrojerkmeanx                                      |
+| 28 | timebodygyrojerkmeany                                      |
+| 29 | timebodygyrojerkmeanz                                      |
+| 30 | timebodygyrojerkstdx                                       |
+| 31 | timebodygyrojerkstdy                                       |
+| 32 | timebodygyrojerkstdz                                       |
+| 33 | timebodyaccelerationmagnitudemean                           |
+| 34 | timebodyaccelerationmagnitudestd                            |
+| 35 | timegravityaccelerationmagnitudemean                        |
+| 36 | timegravityaccelerationmagnitudestd                         |
+| 37 | timebodyaccelerationjerkmagnitudemean                      |
+| 38 | timebodyaccelerationjerkmagnitudestd                       |
+| 39 | timebodygyromagnitudemean                                   |
+| 40 | timebodygyromagnitudestd                                    |
+| 41 | timebodygyrojerkmagnitudemean                              |
+| 42 | timebodygyrojerkmagnitudestd                               |
+| 43 | frequencydomainbodyaccelerationmeanx                        |
+| 44 | frequencydomainbodyaccelerationmeany                        |
+| 45 | frequencydomainbodyaccelerationmeanz                        |
+| 46 | frequencydomainbodyaccelerationstdx                         |
+| 47 | frequencydomainbodyaccelerationstdy                         |
+| 48 | frequencydomainbodyaccelerationstdz                         |
+| 49 | frequencydomainbodyaccelerationmeanfrequencyx              |
+| 50 | frequencydomainbodyaccelerationmeanfrequencyy              |
+| 51 | frequencydomainbodyaccelerationmeanfrequencyz              |
+| 52 | frequencydomainbodyaccelerationjerkmeanx                   |
+| 53 | frequencydomainbodyaccelerationjerkmeany                   |
+| 54 | frequencydomainbodyaccelerationjerkmeanz                   |
+| 55 | frequencydomainbodyaccelerationjerkstdx                    |
+| 56 | frequencydomainbodyaccelerationjerkstdy                    |
+| 57 | frequencydomainbodyaccelerationjerkstdz                    |
+| 58 | frequencydomainbodyaccelerationjerkmeanfrequencyx         |
+| 59 | frequencydomainbodyaccelerationjerkmeanfrequencyy         |
+| 60 | frequencydomainbodyaccelerationjerkmeanfrequencyz         |
+| 61 | frequencydomainbodygyromeanx                                |
+| 62 | frequencydomainbodygyromeany                                |
+| 63 | frequencydomainbodygyromeanz                                |
+| 64 | frequencydomainbodygyrostdx                                 |
+| 65 | frequencydomainbodygyrostdy                                 |
+| 66 | frequencydomainbodygyrostdz                                 |
+| 67 | frequencydomainbodygyromeanfrequencyx                      |
+| 68 | frequencydomainbodygyromeanfrequencyy                      |
+| 69 | frequencydomainbodygyromeanfrequencyz                      |
+| 70 | frequencydomainbodyaccelerationmagnitudemean                |
+| 71 | frequencydomainbodyaccelerationmagnitudestd                 |
+| 72 | frequencydomainbodyaccelerationmagnitudemeanfrequency      |
+| 73 | frequencydomainbodyaccelerationjerkmagnitudemean           |
+| 74 | frequencydomainbodyaccelerationjerkmagnitudestd            |
+| 75 | frequencydomainbodyaccelerationjerkmagnitudemeanfrequency |
+| 76 | frequencydomainbodygyromagnitudemean                        |
+| 77 | frequencydomainbodygyromagnitudestd                         |
+| 78 | frequencydomainbodygyromagnitudemeanfrequency              |
+| 79 | frequencydomainbodygyrojerkmagnitudemean                   |
+| 80 | frequencydomainbodygyrojerkmagnitudestd                    |
+| 81 | frequencydomainbodygyrojerkmagnitudemeanfrequency         |
+| 82 | angletimebodyaccelerationmeangravity                       |
+| 83 | angletimebodyaccelerationjerkmeangravitymean             |
+| 84 | angletimebodygyromeangravitymean                          |
+| 85 | angletimebodygyrojerkmeangravitymean                     |
+| 86 | anglexgravitymean                                            |
+| 87 | angleygravitymean                                            |
+| 88 | anglezgravitymean                                            |
