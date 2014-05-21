@@ -20,7 +20,8 @@ The dataset includes the following files:
 - 'train/y_train.txt': Training labels.
 - 'test/X_test.txt': Test set.
 - 'test/y_test.txt': Test labels.
-- '**averagesPerSubjectAndActivity.txt**':**the the new, tidy dataset (the result of step 5 of the assignment)** 
+
+**averagesPerSubjectAndActivity.txt**: he the new, tidy dataset (the result of step 5 of the assignment) 
 
 **CodeBook.md** This file describes the variables, the data, and any transformations or work that you performed to clean up the data
 

@@ -147,7 +147,7 @@ avgDf$activity <- as.factor(avgDf$activity)
 library(plyr)
 dt <- ddply(avgDf, .(subject, activity), numcolwise(mean))
 ## create file and store results
-write.table(dt, file = "data/averagesPerSubjectAndActivity.txt")
+write.table(dt, file = "averagesPerSubjectAndActivity.txt")
 ```
 
 Variables in the file averagesPerSubjectAndActivity.txt are:
