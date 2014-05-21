@@ -1,4 +1,4 @@
-Read me
+READ ME
 ========================================================
 *Theo Bakker, 21-05-2014, Amsterdam, The Netherlands*
 
